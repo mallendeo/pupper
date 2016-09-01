@@ -1,13 +1,13 @@
 {
   "name": "alarmpi",
   "version": "1.0.0",
-  "description": "",
+  "description": "Home automation with Node and Raspberry Pi ",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "mallendeo",
+  "license": "MIT",
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0"
