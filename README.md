@@ -1,10 +1,10 @@
 # alarmpi
-Home automation with Node and Raspberry Pi
+Home automation with Node and Raspberry Pi.
 
 # Pre-requisites
-Raspberry Pi with Wiring-Pi and it's gpio utility
+Raspberry Pi with Wiring-Pi and its gpio utility.
 
-Tested on ArchLinux ARM with Node 6.5
+Tested on ArchLinux ARM with Node 6.5.
 
 ## Install
 ```bash
