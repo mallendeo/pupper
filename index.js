@@ -1,15 +1,16 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+
+// Routes
 const sensorsRouter = require('./routes/sensors')
 const togglesRouter = require('./routes/toggles')
+
 const config = require('./config')
-const gpio = require('./lib/gpio')
 
 if (!config.authKey) throw Error('authKey not set!')
 
 const PORT = config.port || 8080
-
-gpio.init().then(() => {
+const init = gpio => gpio.init().then(() => {
   const router = new express.Router()
   const app = express()
 
@@ -32,4 +33,18 @@ gpio.init().then(() => {
   console.log(`Listening on port ${PORT}`)
 })
 
+if (process.env.NODE_ENV === 'development') {
+  const fakeGpio = () => {
+    return {
+      init: () => Promise.resolve(),
+      getProx: () => Promise.resolve(1)
+    }
+  }
+
+  init(fakeGpio(config))
+}
+
+init(require('./lib/gpio')(config))
+
+// Graceful shutdown
 process.on('SIGINT', () => process.exit())
