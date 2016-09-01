@@ -1,3 +1,4 @@
+const chalk = require('chalk')
 const express = require('express')
 const bodyParser = require('body-parser')
 
@@ -6,6 +7,8 @@ const sensorsRouter = require('./routes/sensors')
 const togglesRouter = require('./routes/toggles')
 
 const config = require('./config')
+const gpio = require('./lib/gpio')
+const fakeGpio = require('./lib/fakeGpio')
 
 if (!config.authKey) throw Error('authKey not set!')
 
@@ -30,21 +33,16 @@ const init = gpio => gpio.init().then(() => {
   app.use('/', router)
   app.listen(PORT)
 
-  console.log(`Listening on port ${PORT}`)
+  console.log(chalk.green(`\nListening on port ${PORT} 😎 👌`))
 })
-
-if (process.env.NODE_ENV === 'development') {
-  const fakeGpio = () => {
-    return {
-      init: () => Promise.resolve(),
-      getProx: () => Promise.resolve(1)
-    }
-  }
-
-  init(fakeGpio(config))
-}
-
-init(require('./lib/gpio')(config))
 
 // Graceful shutdown
 process.on('SIGINT', () => process.exit())
+
+if (process.env.NODE_ENV === 'development') {
+  console.log(chalk.bold.yellow('env: development'))
+  console.log(chalk.yellow('Using fake GPIO'))
+  init(fakeGpio(config))
+} else {
+  init(gpio(config))
+}

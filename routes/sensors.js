@@ -3,7 +3,7 @@ module.exports = (router, gpio) => {
   router.get('/sensors/proximity', (req, res) => {
     gpio.getProx().then(data => res.json({ data }))
   })
-  
+
   // Intercom call button
   router.get('/sensors/ringBtn', (req, res) => {
     gpio.getBtn().then(data => res.json({ data }))

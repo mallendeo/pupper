@@ -4,12 +4,17 @@
   "description": "Home automation with Node and Raspberry Pi ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "standard ; exit 0"
   },
   "author": "mallendeo",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "chalk": "^1.1.3",
     "express": "^4.14.0"
+  },
+  "devDependencies": {
+    "standard": "^8.0.0"
   }
 }
