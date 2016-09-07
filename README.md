@@ -14,7 +14,7 @@ npm i
 # AUTH_KEY = $3cret
 # PORT = 8080
 # NODE_ENV = development
-sudo AUTH_KEY='$ecret' PORT=8080 NODE_ENV=development node ./
+AUTH_KEY='$ecret' PORT=8080 NODE_ENV=development node ./
 ```
 
 ## Fix permissions
@@ -38,15 +38,15 @@ EOF
 
 # Development
 
-Copy files to Raspberry Pi
+Copy files to the Pi
 ```bash
 rsync -a "$HOME/Desktop/alarmpi" username@host:~/ --exclude node_modules -P
 
-# Specify a ssh key
+# With a ssh key
 rsync -a "$HOME/Desktop/alarmpi" username@host:~/ -e "ssh -i $HOME/.ssh/raspberry" --exclude node_modules -P
 ``` 
 
-SSH into the rPI, then:
+SSH into the Pi, then:
 ```bash
 npm i -g nodemon
 NODE_ENV=development DEBUG="alarmpi" AUTH_KEY="$3cret" nodemon
@@ -96,7 +96,7 @@ NODE_ENV=development DEBUG="alarmpi" AUTH_KEY="$3cret" nodemon
         <td></td>
 	</tr>
 	<tr>
-		<td>Intercom Button</td>
+		<td>Intercom Button [IN]</td>
 		<td>GPIO</td>
 		<td>11</td>
 		<td>12</td>
@@ -104,7 +104,7 @@ NODE_ENV=development DEBUG="alarmpi" AUTH_KEY="$3cret" nodemon
         <td></td>
 	</tr>
 	<tr>
-        <td>Magnetic Sensor</td>
+		<td>Magnetic Sensor [IN]</td>
 		<td>GPIO</td>
 		<td>13</td>
 		<td>14</td>
@@ -112,7 +112,7 @@ NODE_ENV=development DEBUG="alarmpi" AUTH_KEY="$3cret" nodemon
         <td></td>
 	</tr>
 	<tr>
-        <td>Proximity Sensor</td>
+		<td>Proximity Sensor [IN]</td>
 		<td>GPIO</td>
 		<td>15</td>
 		<td>16</td>
@@ -205,7 +205,7 @@ NODE_ENV=development DEBUG="alarmpi" AUTH_KEY="$3cret" nodemon
 		<td>37</td>
 		<td>38</td>
 		<td>GPIO</td>
-        <td>Gate Relay</td>
+		<td>Gate Relay [OUT]</td>
 	</tr>
 	<tr>
         <td></td>
@@ -213,7 +213,7 @@ NODE_ENV=development DEBUG="alarmpi" AUTH_KEY="$3cret" nodemon
 		<td>39</td>
 		<td>40</td>
 		<td>GPIO</td>
-        <td>Door Relay</td>
+		<td>Door Relay [OUT]</td>
 	</tr>
 </table>
 
