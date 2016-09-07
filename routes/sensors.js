@@ -1,16 +1,14 @@
 module.exports = (router, gpio) => {
-  // Intercom proximity sensor
   router.get('/sensors/proximity', (req, res) => {
-    gpio.getProx().then(data => res.json({ data }))
+    res.json({ data: gpio.read(gpio.pins.proximitySensor) })
   })
 
-  // Intercom call button
-  router.get('/sensors/ringBtn', (req, res) => {
-    gpio.getBtn().then(data => res.json({ data }))
+  router.get('/sensors/magnetic', (req, res) => {
+    res.json({ data: gpio.read(gpio.pins.magneticSensor) })
   })
 
   // Gate sensor (check if it's open or closed)
-  router.get('/sensors/magnetic', (req, res) => {
-    gpio.getMag().then(data => res.json({ data }))
+  router.get('/sensors/intercomBtn', (req, res) => {
+    res.json({ data: gpio.read(gpio.pins.intercomBtn) })
   })
 }

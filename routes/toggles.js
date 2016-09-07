@@ -1,11 +1,9 @@
 module.exports = (router, gpio) => {
   router.post('/toggles/gate', (req, res) => {
-    gpio.openGate()
-    res.end()
+    res.json({ data: gpio.toggle(gpio.pins.gateRelay) })
   })
 
   router.post('/toggles/door', (req, res) => {
-    gpio.openDoor()
-    res.end()
+    res.json({ data: gpio.toggle(gpio.pins.doorRelay) })
   })
 }

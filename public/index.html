@@ -6,8 +6,17 @@
 </head>
 <body>
     <h1>AlarmPi</h1>
+<script src="/socket.io/socket.io.js"></script>
 <script>
-    
+'use strict'
+;(() => {
+  
+  const socket = io()
+  socket.on('GPIOChange', (msg) => {
+    console.log(msg)
+  })
+
+})()
 </script>
 </body>
 </html>
