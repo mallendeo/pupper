@@ -8,16 +8,23 @@
 <script>
   ;(() => {
     'use strict'
-    const post = url => fetch(url, {
-      method: 'post',
+    const request = (url, method = 'get', body) => fetch(url, {
+      method,
+      body,
       headers: {
         authorization: localStorage.getItem('authKey'),
         'Content-Type': 'application/json; charset=utf-8'
-      },
-      body: JSON.stringify({ date: Date.now() })
+      }
     })
 
-    post('/api/toggle/doorRelay').then(() => window.close())
+    request(`/api/datePing?now=${ Date.now() }`)
+      .then(res => res.json())
+      .then(({ now, received }) => {
+        const ping = Date.now() - now
+        const timeDiff = received - now - ping
+        return request('/api/toggle/doorRelay', 'post', JSON.stringify({ date: Date.now() + timeDiff }))
+      })
+      .then(() => window.close())
   })()
 </script>
 </body>

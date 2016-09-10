@@ -56,4 +56,7 @@ module.exports = (router, gpio) => {
       res.status(500).json({ error: true })
     }
   })
+
+  router.get('/datePing', (req, res) =>
+    res.json({ now: parseInt(req.query.now), received: Date.now() }))
 }
