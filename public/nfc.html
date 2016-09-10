@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NFC: Open Door</title>
+</head>
+<body>
+<script>
+  ;(() => {
+    'use strict'
+    const post = url => fetch(url, {
+      method: 'post',
+      headers: {
+        authorization: localStorage.getItem('authKey'),
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify({ date: Date.now() })
+    })
+
+    post('/api/toggle/doorRelay').then(() => window.close())
+  })()
+</script>
+</body>
+</html>

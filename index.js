@@ -15,9 +15,7 @@ const gpio = NODE_ENV === 'development'
   : require('./lib/gpio')(config, require('rpio'))
 const websocket = require('./lib/websocket')
 
-const sensorsRouter = require('./routes/sensors')
-const togglesRouter = require('./routes/toggles')
-
+const pinsRouter = require('./routes/pins')
 
 const router = new express.Router()
 const app = express()
@@ -30,22 +28,33 @@ if (NODE_ENV === 'development') {
   debug(chalk.bold.yellow('env: development'))
 }
 
+app.use(express.static('public'))
 
-app.use((req, res, next) => {
+app.use('/api/*', (req, res, next) => {
   if (req.headers.authorization !== AUTH_KEY) {
     return res.status(401).json({ error: 'Invalid key' })
   }
   next()
 })
 
-sensorsRouter(router, gpio)
-togglesRouter(router, gpio)
+io.use((socket, next) => {
+  if (socket.request._query.auth !== AUTH_KEY) {
+    return next(Error('Invalid key'))
+  }
+  next()
+})
 
 websocket(io, gpio)
 
+pinsRouter(router, gpio)
+
+router.get('/', (req, res) => {
+  res.json({ data: { pins: gpio.pins } })
+})
+
 app.use(bodyParser.urlencoded({ extended: true }))
-app.use(express.static('public'))
-app.use('/', router)
+app.use(bodyParser.json())
+app.use('/api', router)
 
 const listener = server.listen(PORT || 8080, () =>
   debug(chalk.green(`Listening on port ${listener.address().port} 😎 👌`)))
