@@ -4,3 +4,6 @@ node_modules
 
 # macOs
 .DS_Store
+
+# Database
+db.json

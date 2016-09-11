@@ -1,18 +1,19 @@
 const chalk = require('chalk')
-const debug = require('debug')('alarmpi:app')
+const debug = require('debug')('pupper:app')
 const express = require('express')
 const bodyParser = require('body-parser')
 const http = require('http')
 const socketio = require('socket.io')
+const db = require('./lib/database')
 
-const config = require('./pinsConfig')
+const pinsConfig = db.get('pins').value()
 
 const { AUTH_KEY, NODE_ENV, PORT } = process.env
 
 // Lib
 const gpio = NODE_ENV === 'development'
-  ? require('./lib/fakeGpio')(config)
-  : require('./lib/gpio')(config, require('rpio'))
+  ? require('./lib/fakeGpio')(pinsConfig)
+  : require('./lib/gpio')(pinsConfig, require('rpio'))
 const websocket = require('./lib/websocket')
 
 const pinsRouter = require('./routes/pins')
@@ -46,18 +47,14 @@ io.use((socket, next) => {
 
 websocket(io, gpio)
 
-pinsRouter(router, gpio)
-
-router.get('/', (req, res) => {
-  res.json({ data: { pins: gpio.pins } })
-})
+pinsRouter(router, gpio, db)
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use('/api', router)
 
 const listener = server.listen(PORT || 8080, () =>
-  debug(chalk.green(`Listening on port ${listener.address().port} 😎 👌`)))
+  debug(chalk.green(`Listening on port ${listener.address().port} 🐶`)))
 
 // Graceful shutdown
 process.on('SIGINT', () => process.exit())
