@@ -43,10 +43,10 @@ EOF
 
 Copy files to the Pi
 ```bash
-rsync -a "$HOME/Desktop/pupper" username@host:~/ --exclude node_modules -P
+rsync -a "$HOME/pupper" username@host:~/ --exclude node_modules -P
 
 # With a ssh key
-rsync -a "$HOME/Desktop/pupper" username@host:~/ -e "ssh -i $HOME/.ssh/raspberry" --exclude node_modules -P
+rsync -a "$HOME/pupper" username@host:~/ -e "ssh -i $HOME/.ssh/raspberry" --exclude node_modules -P
 ``` 
 
 SSH into the Pi, then:
