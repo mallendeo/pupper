@@ -1,7 +1,7 @@
 {
   "name": "pupper",
   "version": "1.0.0",
-  "description": "Raspberry Pi GPIO access made easy",
+  "description": "Raspberry Pi GPIO control made easy",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,12 +10,16 @@
   "author": "mallendeo",
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^2.3.0",
     "body-parser": "^1.15.2",
     "chalk": "^1.1.3",
     "debug": "^2.2.0",
     "express": "^4.14.0",
+    "express-jwt": "^5.0.0",
+    "jsonwebtoken": "^7.1.9",
     "lodash": "^4.15.0",
     "lowdb": "^0.13.1",
+    "node-uuid": "^1.4.7",
     "rpio": "^0.9.12",
     "socket.io": "^1.4.8"
   },
