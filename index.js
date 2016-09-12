@@ -6,7 +6,7 @@ const http = require('http')
 const socketio = require('socket.io')
 const db = require('./lib/database')
 
-const pinsConfig = db.get('pins').value()
+const pinsConfig = db.pins.all()
 
 const { AUTH_KEY, NODE_ENV, PORT } = process.env
 
@@ -17,6 +17,7 @@ const gpio = NODE_ENV === 'development'
 const websocket = require('./lib/websocket')
 
 const pinsRouter = require('./routes/pins')
+const helpersRouter = require('./routes/helpers')
 
 const router = new express.Router()
 const app = express()
@@ -48,6 +49,7 @@ io.use((socket, next) => {
 websocket(io, gpio)
 
 pinsRouter(router, gpio, db)
+helpersRouter(router, gpio)
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())

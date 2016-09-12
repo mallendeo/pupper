@@ -1,9 +1,8 @@
-const debug = require('debug')('pupper:router')
-const { camelCase } = require('lodash')
+const debug = require('debug')('pupper:router:pins')
 
 module.exports = (router, gpio, db) => {
   // Pins collection
-  const pins = db.get('pins')
+  const { pins } = db
 
   // Date diff middleware
   // Checks if the request takes longer than the timeout specified,
@@ -53,89 +52,42 @@ module.exports = (router, gpio, db) => {
     next()
   }
 
-  // API usage and available pins helper
-  router.get('/', (req, res) => {
-    const info = {
-      read: {
-        path: '/api/read/{slug}',
-        method: 'GET'
-      },
-      write: {
-        path: '/api/write/{slug}',
-        method: 'POST',
-        body: { value: 'Number' }
-      },
-      toggle: {
-        path: '/api/toggle/{slug}',
-        method: 'POST',
-        body: {
-          date: 'Number',
-          force: 'Boolean',
-          duration: 'Number'
-        },
-        headers: {
-          authorization: 'Bearer <token>'
-        }
-      }
-    }
-
-    res.json({ pins: gpio.pins, info })
-  })
-
   // Set new pin and export it
   router.post('/pin', (req, res) => {
-    const { name, slug, num, dir, invert } = req.body
-    const newSlug = slug || camelCase(name)
-    if (
-      pins.find({ num }).value() ||
-      pins.find({ slug: newSlug }).value()
-    ) {
-      return res
-        .status(409) // 409 Conflict
-        .json({ error: 'Pin already set' })
+    try {
+      const pin = pins.add(req.body)
+      gpio.open(pin)
+      res.json({ data: pin })
+    } catch (e) {
+      // 409 Conflict
+      res.status(409).json({ error: e.message })
     }
-
-    const pin = pins
-      .push({ name, slug: newSlug, num, dir, invert })
-      .last()
-      .value()
-
-    gpio.open(pin)
-    res.json({ data: pin })
   })
 
   // Remove a pin and unexport it
   router.delete('/pin/:slug', (req, res) => {
-    const removed = pins
-      .remove({ slug: req.params.slug })
-      .value()
-
-    if (!removed.num) {
-      return res
-        .status(404)
-        .json({ error: 'Pin not found' })
+    try {
+      const removed = pins.remove(req.params.slug)
+      gpio.close(removed.num)
+      res.json({ data: { removed } })
+    } catch (e) {
+      res.status(404).json({ error: 'Pin not found' })
     }
-
-    gpio.close(removed.num)
-
-    res.json({ data: { removed } })
   })
 
   // Get pin info by slug
   router.get('/pin/:slug', (req, res) => {
-    const pin = pins.find({ slug: req.params.slug }).value()
+    const pin = pins.find(req.params.slug)
+    if (!pin) return res.status(404).json({ error: 'Pin not found' })
     res.json({ data: { pin } })
   })
 
   // Get all pins
   router.get('/pin', (req, res) => {
-    const allPins = pins
-      .cloneDeep()
-      .value()
-      .map(pin => {
-        pin.uri = `/api/pin/${pin.slug}`
-        return pin
-      })
+    const allPins = pins.all().map(pin => {
+      pin.uri = `/api/pin/${pin.slug}`
+      return pin
+    })
     res.json({ data: { pins: allPins } })
   })
 
@@ -173,10 +125,7 @@ module.exports = (router, gpio, db) => {
         }
       })
     } catch (e) {
-      res.status(500).json({ error: true })
+      res.status(500).json({ error: e.message })
     }
   })
-
-  router.get('/datePing', (req, res) =>
-    res.json({ now: parseInt(req.query.now), received: Date.now() }))
 }
