@@ -7,3 +7,10 @@ node_modules
 
 # Database
 db.json
+db-test.json
+
+# VS Code
+.vscode
+
+# Dist
+dist/
