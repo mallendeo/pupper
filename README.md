@@ -11,10 +11,10 @@ Currently only tested on ArchLinux ARM with Node 6.5.
 ```bash
 git clone https://github.com/mallendeo/pupper
 cd pupper
-npm i
+npm i && npm run build
 
 # Set environment variables
-JWT_SECRET=$ecret PORT=8080 NODE_ENV=development node ./
+JWT_SECRET=$ecret PORT=8080 NODE_ENV=development node ./dist
 ```
 
 ## Fix permissions
@@ -49,8 +49,7 @@ rsync -a "$HOME/pupper" username@host:~/ -e "ssh -i $HOME/.ssh/raspberry" --excl
 SSH into the Pi, then:
 
 ```bash
-npm i -g nodemon
-JWT_SECRET=$ecret NODE_ENV=development DEBUG="pupper" nodemon -i db.json
+JWT_SECRET=$ecret DEBUG="pupper" npm run serve:watch
 ```
 
 ## Test
