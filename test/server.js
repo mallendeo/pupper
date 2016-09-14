@@ -14,10 +14,9 @@ const db = initDb('db-test.json')
 const pinsConfig = db.pins.all()
 
 // define env variables
-const PORT = 3000
-const JWT_SECRET = 'secret'
+process.env.JWT_SECRET = 'secret'
+process.env.PORT = '3000'
 
-// Lib
 const gpio = require('../src/lib/fakeGpio')(pinsConfig)
 
 const router = new express.Router()
@@ -25,7 +24,7 @@ const app = express()
 const server = http.createServer(app)
 const io = socketio(server)
 
-app.use(jwt({ secret: JWT_SECRET }).unless({
+app.use(jwt({ secret: process.env.JWT_SECRET }).unless({
   path: [
     '/api/token/renew',
     '/api/token/verify'
@@ -47,6 +46,15 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use('/api', router)
 
-server.listen(PORT)
+router.get('/killServer', () => process.exit())
+
+const initServer = new Promise((resolve, reject) => {
+  const listener = server.listen(process.env.PORT, () => {
+    console.log(`Listening on port ${listener.address().port}`)
+    resolve()
+  })
+})
+
+export default (() => initServer())
 
 process.on('SIGINT', () => process.exit())
