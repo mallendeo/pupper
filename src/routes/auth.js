@@ -58,8 +58,12 @@ export default (router, db) => {
         .json({ error: `'name' parameter required` })
     }
 
-    const apiKey = db.apiKeys.create(req.body.name)
-    res.json({ data: apiKey })
+    try {
+      const apiKey = db.apiKeys.create(req.body.name)
+      res.json({ data: apiKey })
+    } catch (e) {
+      res.status(501).json({ error: e.message })
+    }
   })
 
   router.delete('/apiKey/:key', (req, res) => {

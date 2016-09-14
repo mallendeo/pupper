@@ -14,7 +14,7 @@ import authRouter from './routes/auth'
 
 let log = debug('pupper:app')
 
-const db = initDb()
+const db = initDb('db.json')
 const pinsConfig = db.pins.all()
 
 const { NODE_ENV, PORT, JWT_SECRET } = process.env

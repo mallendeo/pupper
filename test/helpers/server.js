@@ -4,20 +4,20 @@ import http from 'http'
 import socketio from 'socket.io'
 import jwt from 'express-jwt'
 
-import initDb from '../src/lib/database'
-import websocket from '../src/lib/websocket'
-import pinsRouter from '../src/routes/pins'
-import helpersRouter from '../src/routes/helpers'
-import authRouter from '../src/routes/auth'
+import initDb from '../../src/lib/database'
+import websocket from '../../src/lib/websocket'
+import pinsRouter from '../../src/routes/pins'
+import helpersRouter from '../../src/routes/helpers'
+import authRouter from '../../src/routes/auth'
 
-const db = initDb('db-test.json')
+const db = initDb()
 const pinsConfig = db.pins.all()
 
 // define env variables
 process.env.JWT_SECRET = 'secret'
 process.env.PORT = '3000'
 
-const gpio = require('../src/lib/fakeGpio')(pinsConfig)
+const gpio = require('../../src/lib/fakeGpio')(pinsConfig)
 
 const router = new express.Router()
 const app = express()

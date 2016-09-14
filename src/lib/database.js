@@ -9,8 +9,8 @@ const randomString = (size = 16) =>
 
 const hash = password => bcrypt.hashSync(password, 8)
 
-export default (dbFile = 'db.json') => {
-  const db = low(dbFile, { storage: fileAsync })
+export default (dbFile) => {
+  const db = dbFile ? low(dbFile, { storage: fileAsync }) : low()
 
   db.defaults({
     pins: [],
@@ -26,15 +26,25 @@ export default (dbFile = 'db.json') => {
   const pinsData = db.get('pins')
 
   const apiKeys = {
-    create: name =>
-      apiKeysData
+    create: name => {
+      const checkName = apiKeysData
+        .cloneDeep()
+        .find({ name })
+        .value()
+
+      if (checkName) {
+        throw Error('Key name already exists')
+      }
+
+      return apiKeysData
         .push({
           name,
           key: randomString(),
           secret: randomString(32)
         })
         .last()
-        .value(),
+        .value()
+    },
     remove: key =>
       apiKeysData
         .remove({ key })
