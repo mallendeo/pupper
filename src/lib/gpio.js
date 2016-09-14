@@ -1,7 +1,10 @@
-const debug = require('debug')('pupper:gpio')
-const chalk = require('chalk')
-const EventEmitter = require('events')
+import debug from 'debug'
+import chalk from 'chalk'
+import EventEmitter from 'events'
 
+const log = debug('pupper:gpio')
+
+// Must use CommonJS for conditional require
 module.exports = (pins, rpio) => {
   const emitter = new EventEmitter()
 
@@ -10,7 +13,7 @@ module.exports = (pins, rpio) => {
    * @param {object} pin
    */
   const open = pin => {
-    debug(`Opening/Exporting pin "${chalk.cyan(pin.slug)}" pin ${chalk.red(pin.num)}`)
+    log(`Opening/Exporting pin "${chalk.cyan(pin.slug)}" pin ${chalk.red(pin.num)}`)
 
     if (pin.dir === 'in') {
       // rpio uses the physical pin layout
@@ -19,7 +22,7 @@ module.exports = (pins, rpio) => {
       // Listen for input changes
       rpio.poll(pin.num, num => {
         const data = { slug: pin.slug, num, value: rpio.read(num) }
-        debug('Change event', data)
+        log('Change event', data)
         emitter.emit('change', data)
       })
 
@@ -30,19 +33,19 @@ module.exports = (pins, rpio) => {
   }
 
   const read = pin => {
-    debug('read', pin)
+    log('read', pin)
     const val = rpio.read(pin.num)
     return pin.invert ? !val : !!val
   }
 
   const on = pin => {
-    debug('on', pin)
+    log('on', pin)
     rpio.write(pin.num, pin.invert ? rpio.LOW : rpio.HIGH)
     return read(pin)
   }
 
   const off = pin => {
-    debug('off', pin)
+    log('off', pin)
     rpio.write(pin.num, pin.invert ? rpio.HIGH : rpio.LOW)
     return read(pin)
   }
@@ -64,7 +67,7 @@ module.exports = (pins, rpio) => {
   pins.forEach(open)
 
   process.on('exit', () => {
-    debug('Restoring default pin values')
+    log('Restoring default pin values')
     pins.forEach(pin => close(pin.num))
   })
 

@@ -17,14 +17,19 @@
       }
     })
 
-    request(`/api/datePing?now=${ Date.now() }`)
+    const urlMatch = window.location.search.match(/pin=(.+)/)
+    const pinName = (urlMatch && urlMatch[1]) || 'doorRelay'
+
+    request(`/api/datePing?now=${Date.now()}`)
       .then(res => res.json())
       .then(({ now, received }) => {
         const ping = Date.now() - now
         const timeDiff = received - now - ping
-        return request('/api/toggle/doorRelay', 'post', JSON.stringify({ date: Date.now() + timeDiff }))
+        return request(`/api/toggle/${pinName}`, 'post', JSON.stringify({ date: Date.now() + timeDiff }))
       })
-      .then(() => window.close())
+      .then(() => {
+        window.close()
+      })
   })()
 </script>
 </body>

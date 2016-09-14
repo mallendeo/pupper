@@ -14,10 +14,7 @@ cd pupper
 npm i
 
 # Set environment variables
-# AUTH_KEY = $3cret
-# PORT = 8080
-# NODE_ENV = development
-AUTH_KEY='$ecret' PORT=8080 NODE_ENV=development node ./
+JWT_SECRET=$ecret PORT=8080 NODE_ENV=development node ./
 ```
 
 ## Fix permissions
@@ -50,9 +47,10 @@ rsync -a "$HOME/pupper" username@host:~/ -e "ssh -i $HOME/.ssh/raspberry" --excl
 ``` 
 
 SSH into the Pi, then:
+
 ```bash
 npm i -g nodemon
-NODE_ENV=development DEBUG="pupper" AUTH_KEY="$3cret" nodemon
+JWT_SECRET=$ecret NODE_ENV=development DEBUG="pupper" nodemon -i db.json
 ```
 
 ## Test

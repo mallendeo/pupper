@@ -4,11 +4,26 @@
   "description": "Raspberry Pi GPIO control made easy",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "standard ; exit 0"
+    "lint": "standard src/ ; exit 0",
+    "test": "ava",
+    "test:watch": "npm run test -- -w",
+    "build": "rimraf dist && babel src -d dist",
+    "serve": "node ./dist",
+    "serve:watch": "nodemon ./dist -i db.json",
+    "serve:dev": "nodemon --exec babel-node ./src -i db.json"
   },
   "author": "mallendeo",
   "license": "MIT",
+  "standard": {
+    "parser": "babel-eslint"
+  },
+  "ava": {
+    "babel": "inherit",
+    "require": [
+      "babel-register",
+      "babel-polyfill"
+    ]
+  },
   "dependencies": {
     "bcryptjs": "^2.3.0",
     "body-parser": "^1.15.2",
@@ -19,11 +34,20 @@
     "jsonwebtoken": "^7.1.9",
     "lodash": "^4.15.0",
     "lowdb": "^0.13.1",
-    "node-uuid": "^1.4.7",
+    "node-fetch": "^1.6.1",
     "rpio": "^0.9.12",
-    "socket.io": "^1.4.8"
+    "socket.io": "^1.4.8",
+    "socketio-jwt": "^4.5.0"
   },
   "devDependencies": {
+    "ava": "^0.16.0",
+    "babel-cli": "^6.11.4",
+    "babel-core": "^6.9.1",
+    "babel-eslint": "^6.1.2",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-stage-2": "^6.11.0",
+    "nodemon": "^1.10.2",
+    "rimraf": "^2.5.4",
     "standard": "^8.0.0"
   }
 }

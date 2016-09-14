@@ -1,6 +1,9 @@
-const chalk = require('chalk')
-const debug = require('debug')('pupper:fakeGPIO')
-const gpio = require('./gpio')
+import chalk from 'chalk'
+import debug from 'debug'
+import gpio from './gpio'
+
+const log = debug('pupper:fakeGPIO')
+
 const stdin = process.openStdin()
 
 let state = {}
@@ -11,7 +14,7 @@ const rpio = {
   },
   close () {},
   poll (pin, cb) {
-    debug(chalk.magenta(`Listening for keypress for pin ${pin}`))
+    log(chalk.magenta(`Listening for keypress for pin ${pin}`))
 
     // Usage: {pinNumber} {state}
     // e.g 11 0 or 11 1
@@ -39,5 +42,7 @@ const rpio = {
   HIGH: 1
 }
 
-debug(chalk.magenta('Using fake GPIO'))
+log(chalk.magenta('Using fake GPIO'))
+
+// Must use CommonJS for conditional require
 module.exports = pins => gpio(pins, rpio)

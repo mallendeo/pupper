@@ -1,4 +1,4 @@
-module.exports = (router, gpio) => {
+export default (router, gpio) => {
   router.get('/datePing', (req, res) =>
     res.json({ now: parseInt(req.query.now), received: Date.now() }))
 

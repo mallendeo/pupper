@@ -1,6 +1,8 @@
-const debug = require('debug')('pupper:router:pins')
+import debug from 'debug'
 
-module.exports = (router, gpio, db) => {
+const log = debug('pupper:router:pins')
+
+export default (router, gpio, db) => {
   // Pins collection
   const { pins } = db
 
@@ -24,7 +26,7 @@ module.exports = (router, gpio, db) => {
 
     try {
       const dateDiff = Date.now() - parseInt(req.body.date)
-      debug(`Check datediff: ${dateDiff}ms`)
+      log(`Check datediff: ${dateDiff}ms`)
       if (dateDiff > (req.body.timeout || 1000)) {
         return res
           .status(401)
@@ -114,18 +116,20 @@ module.exports = (router, gpio, db) => {
     if (req.body.value === undefined || req.body.value === '') {
       return res
         .status(400)
-        .json({ error: 'value required' })
+        .json({ error: `Key 'value' required` })
     }
 
-    try {
-      const value = parseInt(req.body.value)
-      res.json({
-        data: {
-          value: value === 0 ? gpio.off(req.pin) : gpio.on(req.pin)
-        }
-      })
-    } catch (e) {
-      res.status(500).json({ error: e.message })
+    const value = parseInt(req.body.value)
+    if (isNaN(value)) {
+      return res
+        .status(400)
+        .json({ error: `'value' must be a number` })
     }
+
+    res.json({
+      data: {
+        value: value === 0 ? gpio.off(req.pin) : gpio.on(req.pin)
+      }
+    })
   })
 }
