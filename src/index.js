@@ -34,7 +34,7 @@ if (NODE_ENV === 'development') {
   log(chalk.bold.yellow('env: development'))
 }
 
-app.use(express.static('public'))
+app.use(express.static(`${__dirname}/public`))
 
 // Protect all API routes but renewToken
 app.use(jwt({ secret: JWT_SECRET }).unless({
