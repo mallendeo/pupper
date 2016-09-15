@@ -49,12 +49,12 @@ rsync -a "$HOME/pupper" username@host:~/ -e "ssh -i $HOME/.ssh/raspberry" --excl
 SSH into the Pi, then:
 
 ```bash
-JWT_SECRET=$ecret DEBUG="pupper" npm run serve:watch
+JWT_SECRET='secret' DEBUG="pupper*" npm run serve:watch
 ```
 
 ## Test
 
-*TODO...*
+npm test
 
 # License
 

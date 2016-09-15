@@ -14,7 +14,11 @@ export const post = async (url, body = {}, token) =>
 
 export const get = async (url, token) =>
   fetch(makeUrl(url), {
-    headers: {
-      authorization: `Bearer ${token}`
-    }
+    headers: { authorization: `Bearer ${token}` }
+  })
+
+export const remove = async (url, token) =>
+  fetch(makeUrl(url), {
+    method: 'delete',
+    headers: { authorization: `Bearer ${token}` }
   })

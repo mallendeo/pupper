@@ -49,8 +49,7 @@ app.use('/api', router)
 router.get('/killServer', () => process.exit())
 
 const initServer = new Promise((resolve, reject) => {
-  const listener = server.listen(process.env.PORT, () => {
-    console.log(`Listening on port ${listener.address().port}`)
+  server.listen(process.env.PORT, () => {
     resolve()
   })
 })
