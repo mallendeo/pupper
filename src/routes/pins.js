@@ -116,14 +116,14 @@ export default (router, gpio, db) => {
     if (req.body.value === undefined || req.body.value === '') {
       return res
         .status(400)
-        .json({ error: `Key 'value' required` })
+        .json({ error: 'value required' })
     }
 
     const value = parseInt(req.body.value)
     if (isNaN(value)) {
       return res
         .status(400)
-        .json({ error: `'value' must be a number` })
+        .json({ error: 'value must be a number' })
     }
 
     res.json({

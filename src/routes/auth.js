@@ -55,7 +55,7 @@ export default (router, db) => {
     if (!req.body.name) {
       return res
         .status(400)
-        .json({ error: `'name' parameter required` })
+        .json({ error: 'name param required' })
     }
 
     try {
@@ -70,10 +70,10 @@ export default (router, db) => {
     if (!req.params.key) {
       return res
         .status(400)
-        .json({ error: `'key' param required` })
+        .json({ error: 'key param required' })
     }
 
-    const apiKey = db.apiKeys.remove(req.body.key)
+    const apiKey = db.apiKeys.remove(req.params.key)
     res.json({ data: apiKey })
   })
 
@@ -90,6 +90,6 @@ export default (router, db) => {
 
     return res
       .status(500)
-      .json({ error: `Couldn't update the password` })
+      .json({ error: 'Couldn\'t update the password' })
   })
 }

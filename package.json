@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "standard src/ ; exit 0",
-    "test": "ava",
+    "test": "ava --serial",
     "test:watch": "npm run test -- -w",
     "build": "rimraf dist && babel src -d dist",
     "serve": "node ./dist",

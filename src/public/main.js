@@ -44,12 +44,15 @@
   post('/api/token/verify')
     .then(({ valid }) => {
       console.log('valid', valid)
-      if (!valid) return renewToken(getKey(), getSecret())
+      if (!valid) {
+        const newToken = renewToken(getKey(), getSecret())
+        newToken.then(console.log)
+        return newToken
+      }
       return { token: getToken() }
     })
     .then(({ token }) => setToken(token))
     .then(() => {
-      console.log('asd')
       triggerGate.addEventListener('click', () =>
         post('/api/toggle/gateRelay', { date: Date.now() + timeDiff }))
       triggerDoor.addEventListener('click', () =>
