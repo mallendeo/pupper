@@ -1,20 +1,34 @@
-# Pupper
-Raspberry Pi's GPIO control made easy.
-
-Pupper allows you to create simple REST APIs for control your Raspberry Pi pins.
+# Pupper 🐶
+Control your Pi's GPIO pins through a simple REST API.
 It has websockets support for real-time gpio change events (like button presses, or sensors).
 
-Currently only tested on ArchLinux ARM with Node 6.5.
+Currently only tested on a Raspberry Pi 2 with ArchLinux ARM and Node 6.5.
 
 ## Install
 
+Install cmake (rpio)
+
+```bash
+# macOS
+brew install cmake
+
+# ArchLinux
+sudo pacman -Sy base-devel cmake
+
+# Ubuntu/Debian
+sudo apt-get install build-essential cmake
+```
+
+Clone the repository and build
 ```bash
 git clone https://github.com/mallendeo/pupper
 cd pupper
 npm i && npm run build
+```
 
-# Set environment variables
-JWT_SECRET=$ecret PORT=8080 NODE_ENV=development node ./dist
+Set environment variables and run
+```bash
+JWT_SECRET=secret PORT=8080 NODE_ENV=development npm start
 ```
 
 ## Fix permissions
@@ -24,14 +38,14 @@ To access this device, your user will need to be a member of the gpio group.
 Create the group and add your user:
 
 ```bash
-groupadd -f -r gpio
-usermod -G gpio username
+sudo groupadd -f -r gpio
+sudo usermod -G gpio username
 ```
 
 Then you need to configure udev with the following rule:
 
 ```bash
-cat >/etc/udev/rules.d/20-gpiomem.rules <<EOF
+sudo cat >/etc/udev/rules.d/20-gpiomem.rules <<EOF
 SUBSYSTEM=="bcm2835-gpiomem", KERNEL=="gpiomem", GROUP="gpio", MODE="0660"
 EOF
 ```
@@ -49,7 +63,7 @@ rsync -a "$HOME/pupper" username@host:~/ -e "ssh -i $HOME/.ssh/raspberry" --excl
 SSH into the Pi, then:
 
 ```bash
-JWT_SECRET='secret' DEBUG="pupper*" npm run serve:watch
+JWT_SECRET=secret DEBUG="pupper*" npm run watch
 ```
 
 ## Test

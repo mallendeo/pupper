@@ -8,9 +8,8 @@
     "test": "ava --serial",
     "test:watch": "npm run test -- -w",
     "build": "rimraf dist && babel src -d dist",
-    "serve": "node ./dist",
-    "serve:watch": "nodemon ./dist -i db.json",
-    "serve:dev": "nodemon --exec babel-node ./src -i db.json"
+    "start": "node ./dist",
+    "watch": "nodemon --exec babel-node ./src -i db.json"
   },
   "author": "mallendeo",
   "license": "MIT",
