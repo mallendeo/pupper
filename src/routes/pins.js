@@ -1,4 +1,5 @@
 import debug from 'debug'
+import { checkDateDiff } from '../lib/helpers'
 
 const log = debug('pupper:router:pins')
 
@@ -25,14 +26,12 @@ export default (router, gpio, db) => {
     }
 
     try {
-      const dateDiff = Date.now() - parseInt(req.body.date)
       log(`Check datediff: ${dateDiff}ms`)
-      if (dateDiff > (req.body.timeout || 1000)) {
+      if (!checkDateDiff(req.body.date, req.body.timeout)) {
         return res
           .status(401)
-          .json({ error: 'Time diff was longer than one second' })
+          .json({ error: 'Time diff was longer than the timeout' })
       }
-      req.dateDiff = dateDiff
       next()
     } catch (e) {
       return res
@@ -77,13 +76,6 @@ export default (router, gpio, db) => {
     }
   })
 
-  // Get pin info by slug
-  router.get('/pin/:slug', (req, res) => {
-    const pin = pins.find(req.params.slug)
-    if (!pin) return res.status(404).json({ error: 'Pin not found' })
-    res.json({ data: { pin } })
-  })
-
   // Get all pins
   router.get('/pin', (req, res) => {
     const allPins = pins.all().map(pin => {
@@ -91,6 +83,13 @@ export default (router, gpio, db) => {
       return pin
     })
     res.json({ data: { pins: allPins } })
+  })
+
+  // Get pin info by slug
+  router.get('/pin/:slug', (req, res) => {
+    const pin = pins.find(req.params.slug)
+    if (!pin) return res.status(404).json({ error: 'Pin not found' })
+    res.json({ data: { pin } })
   })
 
   // Read state of a pin

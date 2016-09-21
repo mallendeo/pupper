@@ -5,6 +5,7 @@ import bodyParser from 'body-parser'
 import http from 'http'
 import socketio from 'socket.io'
 import jwt from 'express-jwt'
+import cors from 'cors'
 
 import initDb from './lib/database'
 import websocket from './lib/websocket'
@@ -40,7 +41,8 @@ app.use(express.static(`${__dirname}/public`))
 app.use(jwt({ secret: JWT_SECRET }).unless({
   path: [
     '/api/token/renew',
-    '/api/token/verify'
+    '/api/token/verify',
+    '/api/apiKey/init'
   ]
 }))
 
@@ -56,8 +58,10 @@ pinsRouter(router, gpio, db)
 helpersRouter(router, gpio)
 authRouter(router, db)
 
+
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(cors())
 app.use('/api', router)
 
 const listener = server.listen(PORT || 8080, () =>

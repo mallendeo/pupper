@@ -8,20 +8,8 @@ const generateToken = (type = 'app', expire = 600) =>
 
 export default (router, db) => {
   router.post('/token/renew', (req, res) => {
-    if (req.body.password) {
-      if (!db.settings.checkPassword(req.body.password)) {
-        return res
-          .status(401)
-          .json({ error: 'Incorrect password' })
-      }
-      return res.json({
-        token: generateToken('admin')
-      })
-    }
-
-    if (db.apiKeys.verify(req.body.key, req.body.secret)) {
-      return res.json({ token: generateToken() })
-    }
+    const key = db.apiKeys.get(req.body.key, req.body.secret)
+    if (key) return res.json({ token: generateToken(key.name) })
 
     res.status(401).json({ error: 'Invalid key' })
   })
@@ -37,7 +25,7 @@ export default (router, db) => {
   })
 
   // Check user type middleware
-  router.use(['/apiKey*', '/password'], (req, res, next) => {
+  const checkAdmin = (req, res, next) => {
     if (req.user.type !== 'admin') {
       return res
         .status(401)
@@ -45,13 +33,25 @@ export default (router, db) => {
     }
 
     next()
+  }
+
+  // Generate key for admin after install
+  router.get('/apiKey/init', (req, res) => {
+    if (db.apiKeys.all().length) {
+      return res
+        .status(403)
+        .json({ error: 'Initial API key already reclaimed' })
+    }
+
+    const apiKey = db.apiKeys.create('Admin')
+    res.json({ data: apiKey })
   })
 
-  router.get('/apiKey', (req, res) => {
+  router.get('/apiKey', checkAdmin, (req, res) => {
     res.json({ data: db.apiKeys.all() })
   })
 
-  router.post('/apiKey', (req, res) => {
+  router.post('/apiKey', checkAdmin, (req, res) => {
     if (!req.body.name) {
       return res
         .status(400)
@@ -66,7 +66,7 @@ export default (router, db) => {
     }
   })
 
-  router.delete('/apiKey/:key', (req, res) => {
+  router.delete('/apiKey/:key', checkAdmin, (req, res) => {
     if (!req.params.key) {
       return res
         .status(400)
@@ -75,21 +75,5 @@ export default (router, db) => {
 
     const apiKey = db.apiKeys.remove(req.params.key)
     res.json({ data: apiKey })
-  })
-
-  router.put('/password', (req, res) => {
-    if (!req.body.old || !req.body.new) {
-      return res
-        .status(400)
-        .json({ error: 'Old and new passwords required' })
-    }
-
-    if (db.settings.updatePassword(req.body.old, req.body.new)) {
-      return res.json({ updated: true })
-    }
-
-    return res
-      .status(500)
-      .json({ error: 'Couldn\'t update the password' })
   })
 }

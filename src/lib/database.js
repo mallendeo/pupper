@@ -1,28 +1,20 @@
 import low from 'lowdb'
 import fileAsync from 'lowdb/lib/file-async'
-import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import { camelCase } from 'lodash'
 
 const randomString = (size = 16) =>
   crypto.randomBytes(size).toString('hex')
 
-const hash = password => bcrypt.hashSync(password, 8)
-
 export default (dbFile) => {
   const db = dbFile ? low(dbFile, { storage: fileAsync }) : low()
 
   db.defaults({
     pins: [],
-    settings: {
-      password: hash('admin'),
-      apiKeys: []
-    }
+    apiKeys: []
   }).value()
 
-  const apiKeysData = db.get('settings.apiKeys')
-  const passwordData = db.get('settings.password')
-  const settingsData = db.get('settings')
+  const apiKeysData = db.get('apiKeys')
   const pinsData = db.get('pins')
 
   const apiKeys = {
@@ -40,36 +32,24 @@ export default (dbFile) => {
         .push({
           name,
           key: randomString(),
-          secret: randomString(32)
+          secret: randomString()
         })
         .last()
         .value()
     },
-    remove: key =>
+    remove: (key, secret) =>
       apiKeysData
-        .remove({ key })
+        .remove({ key, secret })
         .value(),
-    verify: (key, secret) =>
+    get: (key, secret) =>
       apiKeysData
         .cloneDeep()
-        .find({ key })
+        .find({ key, secret })
         .value(),
     all: () =>
       apiKeysData
         .cloneDeep()
         .value()
-  }
-
-  const settings = {
-    updatePassword: (oldPassword, newPassword) => {
-      if (bcrypt.compareSync(oldPassword, passwordData.value())) {
-        return settingsData.assign({ password: hash(newPassword) })
-      }
-
-      return false
-    },
-    checkPassword: password =>
-      bcrypt.compareSync(password, passwordData.value())
   }
 
   const pins = {
@@ -110,7 +90,6 @@ export default (dbFile) => {
   return {
     db,
     pins,
-    settings,
     apiKeys
   }
 }

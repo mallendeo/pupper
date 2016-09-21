@@ -25,7 +25,7 @@
   const getSecret = () => localStorage.getItem('authSecret')
   const setSecret = secret => localStorage.setItem('authSecret', secret)
 
-  const post = (url, data = {}) => fetch(url, {
+  const post = (url, data = {}) => fetch(`http://localhost:8080${url}`, {
     method: 'post',
     headers: {
       authorization: `Bearer ${getToken()}`,
