@@ -22,7 +22,7 @@ module.exports = (pins, rpio) => {
       // Listen for input changes
       rpio.poll(pin.num, num => {
         const data = { slug: pin.slug, num, value: rpio.read(num) }
-        log('Change event', data)
+        log('change', data)
         emitter.emit('change', data)
       })
 
@@ -34,8 +34,7 @@ module.exports = (pins, rpio) => {
 
   const read = pin => {
     log('read', pin)
-    const val = rpio.read(pin.num)
-    return pin.invert ? !val : !!val
+    return rpio.read(pin.num)
   }
 
   const on = pin => {
@@ -61,14 +60,14 @@ module.exports = (pins, rpio) => {
     return { pin, duration }
   }
 
-  const close = num => rpio.close(num)
+  const close = pin => rpio.close(pin.num)
 
   // Inital state
   pins.forEach(open)
 
   process.on('exit', () => {
     log('Restoring default pin values')
-    pins.forEach(pin => close(pin.num))
+    pins.forEach(close)
   })
 
   return {

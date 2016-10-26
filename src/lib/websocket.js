@@ -23,13 +23,13 @@ export default (io, gpio, db) => {
         socket.volatile.emit('datePong', { now, received: Date.now() })
       })
 
-      socket.on('pinRead', ({ slug }) => {
+      socket.on('pin:read', ({ slug }) => {
         log(`pinRead: ${slug}, by: ${socket.decoded_token.name}`)
         const pin = getPin(slug)
         socket.emit('pinData', { pin, value: gpio.read(pin) })
       })
 
-      socket.on('pinWrite', ({ slug, value, date }) => {
+      socket.on('pin:write', ({ slug, value, date }) => {
         log(`pinWrite: ${slug}, by: ${socket.decoded_token.name}`)
         if (!checkTimeDiff(date)) {
           return socket.emit('dateDiffError')
@@ -41,7 +41,7 @@ export default (io, gpio, db) => {
         })
       })
 
-      socket.on('pinToggle', ({ slug, duration, date }) => {
+      socket.on('pin:toggle', ({ slug, duration, date }) => {
         log(`pinToggle: ${slug}, by: ${socket.decoded_token.name}`)
         if (!checkTimeDiff(date)) {
           return socket.emit('dateDiffError')

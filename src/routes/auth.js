@@ -1,14 +1,25 @@
 const jwt = require('jsonwebtoken')
 
-const generateToken = (type = 'app', expire = 600) =>
-  jwt.sign({ type }, process.env.JWT_SECRET, {
+const generateToken = (name = 'app', expire = 600) =>
+  jwt.sign({ name }, process.env.JWT_SECRET, {
     issuer: 'pupper',
     expiresIn: expire
   })
 
+// Check user type middleware
+const checkAdmin = (req, res, next) => {
+  if (req.user.name !== 'Admin') {
+    return res
+      .status(401)
+      .json({ error: 'Not allowed' })
+  }
+
+  next()
+}
+
 export default (router, db) => {
   router.post('/token/renew', (req, res) => {
-    const key = db.apiKeys.get(req.body.key, req.body.secret)
+    const key = db.apiKeys.get(req.body.key)
     if (key) return res.json({ token: generateToken(key.name) })
 
     res.status(401).json({ error: 'Invalid key' })
@@ -24,27 +35,27 @@ export default (router, db) => {
     }
   })
 
-  // Check user type middleware
-  const checkAdmin = (req, res, next) => {
-    if (req.user.type !== 'admin') {
-      return res
-        .status(401)
-        .json({ error: 'Not allowed' })
-    }
-
-    next()
-  }
-
   // Generate key for admin after install
   router.get('/apiKey/init', (req, res) => {
     if (db.apiKeys.all().length) {
       return res
         .status(403)
-        .json({ error: 'Initial API key already reclaimed' })
+        .json({ error: 'Initial API key already claimed.' })
     }
 
     const apiKey = db.apiKeys.create('Admin')
     res.json({ data: apiKey })
+  })
+
+  router.post('/apiKey/claim', (req, res) => {
+    try {
+      const key = db.apiKeys.claim(req.body.code)
+      res.json({ data: key })
+    } catch (e) {
+      return res
+        .status(403)
+        .json({ error: e.message })
+    }
   })
 
   router.get('/apiKey', checkAdmin, (req, res) => {

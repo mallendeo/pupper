@@ -1,7 +1,4 @@
-import debug from 'debug'
-import { checkDateDiff } from '../lib/helpers'
-
-const log = debug('pupper:router:pins')
+import { checkTimeDiff } from '../lib/helpers'
 
 export default (router, gpio, db) => {
   // Pins collection
@@ -26,8 +23,7 @@ export default (router, gpio, db) => {
     }
 
     try {
-      log(`Check datediff: ${dateDiff}ms`)
-      if (!checkDateDiff(req.body.date, req.body.timeout)) {
+      if (!checkTimeDiff(req.body.date, req.body.timeout)) {
         return res
           .status(401)
           .json({ error: 'Time diff was longer than the timeout' })

@@ -3,10 +3,10 @@ import fileAsync from 'lowdb/lib/file-async'
 import crypto from 'crypto'
 import { camelCase } from 'lodash'
 
-const randomString = (size = 16) =>
+const randomString = (size = 32) =>
   crypto.randomBytes(size).toString('hex')
 
-export default (dbFile) => {
+export default dbFile => {
   const db = dbFile ? low(dbFile, { storage: fileAsync }) : low()
 
   db.defaults({
@@ -24,27 +24,31 @@ export default (dbFile) => {
         .find({ name })
         .value()
 
-      if (checkName) {
-        throw Error('Key name already exists')
-      }
+      if (checkName) throw Error('Key name already exists')
 
       return apiKeysData
         .push({
           name,
           key: randomString(),
-          secret: randomString()
+          code: randomString(3)
         })
         .last()
         .value()
     },
-    remove: (key, secret) =>
+    claim: code => {
+      if (!code) throw Error('Code required!')
+      const key = apiKeysData.find({ code })
+      if (!key.value()) throw Error('Key not found or already claimed.')
+      return key.assign({ code: null }).value()
+    },
+    remove: key =>
       apiKeysData
-        .remove({ key, secret })
+        .remove({ key })
         .value(),
-    get: (key, secret) =>
+    get: key =>
       apiKeysData
         .cloneDeep()
-        .find({ key, secret })
+        .find({ key })
         .value(),
     all: () =>
       apiKeysData
@@ -69,11 +73,7 @@ export default (dbFile) => {
     },
     remove: slug => {
       const removed = pinsData.remove({ slug }).value()
-
-      if (!removed.num) {
-        throw Error('Pin not found')
-      }
-
+      if (!removed.num) throw Error('Pin not found')
       return removed
     },
     find: slug =>
