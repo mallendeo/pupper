@@ -26,11 +26,12 @@ export default dbFile => {
 
       if (checkName) throw Error('Key name already exists')
 
+      const code = name === 'Admin' ? undefined : randomString(3)
       return apiKeysData
         .push({
           name,
           key: randomString(),
-          code: randomString(3)
+          code
         })
         .last()
         .value()
