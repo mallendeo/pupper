@@ -37,9 +37,10 @@ export default dbFile => {
     },
     claim: code => {
       if (!code) throw Error('Code required!')
-      const key = apiKeysData.find({ code })
-      if (!key.value()) throw Error('Key not found or already claimed.')
-      return key.assign({ code: null }).value()
+      const key = apiKeysData.find({ code }).value()
+      if (!key) throw Error('Key not found or already claimed.')
+      delete key['code']
+      return key
     },
     remove: key =>
       apiKeysData
@@ -58,6 +59,8 @@ export default dbFile => {
 
   const pins = {
     add: ({ name, slug, num, dir, invert }) => {
+      if (!name || !slug || !num) throw Error('Missing parameters.')
+
       const newSlug = slug || camelCase(name)
       if (
         pinsData.find({ num }).value() ||
