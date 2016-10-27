@@ -2,8 +2,6 @@
 Control your Pi's GPIO pins through a simple REST API.
 It has websockets support for real-time gpio change events (like button presses, or sensors).
 
-Currently only tested on a Raspberry Pi 2 with ArchLinux ARM and Node 6.5.
-
 ## Install
 
 Install cmake (rpio)
@@ -16,7 +14,7 @@ brew install cmake
 sudo pacman -Sy base-devel cmake
 
 # Ubuntu/Debian
-sudo apt-get install build-essential cmake
+sudo apt install build-essential cmake
 ```
 
 Clone the repository and build
@@ -69,6 +67,10 @@ JWT_SECRET=secret DEBUG="pupper*" npm run watch
 ## Test
 
 npm test
+
+## TODO
+
+Update tests...
 
 # License
 

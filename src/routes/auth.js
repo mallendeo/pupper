@@ -2,7 +2,7 @@ import { checkAdmin } from './middleware/admin'
 
 const jwt = require('jsonwebtoken')
 
-const generateToken = (name = 'app', expire = 600) =>
+const generateToken = (name, expire = 600) =>
   jwt.sign({ name }, process.env.JWT_SECRET, {
     issuer: 'pupper',
     expiresIn: expire
