@@ -1,4 +1,5 @@
 import { checkTimeDiff } from '../lib/helpers'
+import { checkAdmin } from './middleware/admin'
 
 export default (router, gpio, db) => {
   // Pins collection
@@ -50,7 +51,7 @@ export default (router, gpio, db) => {
   }
 
   // Set new pin and export it
-  router.post('/pin', (req, res) => {
+  router.post('/pin', [checkAdmin], (req, res) => {
     try {
       const pin = pins.add(req.body)
       gpio.open(pin)
@@ -62,7 +63,7 @@ export default (router, gpio, db) => {
   })
 
   // Remove a pin and unexport it
-  router.delete('/pin/:slug', (req, res) => {
+  router.delete('/pin/:slug', [checkAdmin], (req, res) => {
     try {
       const removed = pins.remove(req.params.slug)
       gpio.close(removed.num)

@@ -1,3 +1,5 @@
+import { checkAdmin } from './middleware/admin'
+
 const jwt = require('jsonwebtoken')
 
 const generateToken = (name = 'app', expire = 600) =>
@@ -5,17 +7,6 @@ const generateToken = (name = 'app', expire = 600) =>
     issuer: 'pupper',
     expiresIn: expire
   })
-
-// Check user type middleware
-const checkAdmin = (req, res, next) => {
-  if (req.user.name !== 'Admin') {
-    return res
-      .status(401)
-      .json({ error: 'Not allowed' })
-  }
-
-  next()
-}
 
 export default (router, db) => {
   router.post('/token/renew', (req, res) => {
