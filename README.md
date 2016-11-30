@@ -1,6 +1,7 @@
 # Pupper 🐶
 Control your Pi's GPIO pins through a simple REST API.
-It has websockets support for real-time gpio change events (like button presses, or sensors).
+It has websockets support for real-time gpio change events
+(like button presses, or sensors) and built-in security using JWT.
 
 ## Install
 
@@ -37,7 +38,7 @@ Create the group and add your user:
 
 ```bash
 sudo groupadd -f -r gpio
-sudo usermod -G gpio username
+sudo usermod -G gpio `whoami`
 ```
 
 Then you need to configure udev with the following rule:

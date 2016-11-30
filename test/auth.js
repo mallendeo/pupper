@@ -20,7 +20,7 @@ test('Get and verify JWT', async t => {
   const token = await getValidToken()
   const data = await (await post('/token/verify', {}, token)).json()
   t.is(data.valid, true)
-  t.is(data.token.type, 'admin')
+  t.is(data.token.name, 'Admin')
 })
 
 test('Create API key', async t => {
@@ -41,8 +41,8 @@ test('Creating a duplicated API key (name)', async t => {
 test('Normal tokens shouldn\'t be allowed to create keys', async t => {
   const adminToken = await getValidToken()
   const { data } = await (await get('/apiKey', adminToken)).json()
-  const { key, secret } = data[0]
-  const { token } = await (await post('/token/renew', { key, secret })).json()
+  const { key } = data[0]
+  const { token } = await (await post('/token/renew', { key })).json()
   const res = await post('/apiKey', { name: 'iOS App' }, token)
   t.is(res.status, 401)
 })

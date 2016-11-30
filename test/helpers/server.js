@@ -7,10 +7,13 @@ import jwt from 'express-jwt'
 import initDb from '../../src/lib/database'
 import websocket from '../../src/lib/websocket'
 import pinsRouter from '../../src/routes/pins'
-import helpersRouter from '../../src/routes/helpers'
 import authRouter from '../../src/routes/auth'
 
 const db = initDb()
+
+// demo token
+db.db.get('apiKeys').push({ name: 'Admin', key: 'demo' }).value()
+
 const pinsConfig = db.pins.all()
 
 // define env variables
@@ -39,7 +42,6 @@ app.use((err, req, res, next) => {
 
 websocket(io, gpio)
 pinsRouter(router, gpio, db)
-helpersRouter(router, gpio)
 authRouter(router, db)
 
 app.use(bodyParser.urlencoded({ extended: true }))
