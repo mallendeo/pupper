@@ -1,7 +1,9 @@
 import { checkTimeDiff } from '../lib/helpers'
-import { checkAdmin } from './middleware/admin'
+import { isAdmin } from './middleware/admin'
 
 export default (router, gpio, db) => {
+  const checkAdmin = isAdmin(db)
+
   // Pins collection
   const { pins } = db
 

@@ -1,5 +1,4 @@
 import debug from 'debug'
-import socketioJwt from 'socketio-jwt'
 import { checkTimeDiff } from './helpers'
 
 const log = debug('pupper:socket.io')
@@ -7,49 +6,51 @@ const log = debug('pupper:socket.io')
 export default (io, gpio, db) => {
   const getPin = slug => gpio.pins.find(pin => pin.slug === slug)
 
-  io.sockets
-    .on('connection', socketioJwt.authorize({
-      secret: process.env.JWT_SECRET,
-      timeout: 15000
-    }))
-    .on('authenticated', socket => {
-      log(`Client connected: ${socket.decoded_token.name}`)
+  io.use((socket, next) => {
+    const { key } = socket.handshake.query
+    if (!key) return next(Error('Key required'))
+    if (db.apiKeys.get(key)) return next()
+    next(new Error('Authentication error'))
+  })
 
-      socket.on('disconnect', () => {
-        log(`Client disconnected: ${socket.decoded_token.name}`)
-      })
+  io.on('connection', socket => {
+    log(`Client connected`)
 
-      socket.on('datePing', ({ now }) => {
-        socket.volatile.emit('datePong', { now, received: Date.now() })
-      })
+    socket.on('disconnect', () => {
+      log(`Client disconnected`)
+    })
 
-      socket.on('pin:read', ({ slug }) => {
-        log(`pinRead: ${slug}, by: ${socket.decoded_token.name}`)
-        const pin = getPin(slug)
-        socket.emit('pinData', { pin, value: gpio.read(pin) })
-      })
+    socket.on('datePing', ({ now }) => {
+      socket.volatile.emit('datePong', { now, received: Date.now() })
+    })
 
-      socket.on('pin:write', ({ slug, value, date }) => {
-        log(`pinWrite: ${slug}, by: ${socket.decoded_token.name}`)
-        if (!checkTimeDiff(date)) {
-          return socket.emit('dateDiffError')
-        }
-        const pin = getPin(slug)
-        socket.emit('pinData', {
-          pin,
-          value: value === 0 ? gpio.off(pin) : gpio.on(pin)
-        })
-      })
+    socket.on('pin:read', ({ slug }) => {
+      log(`pinRead: ${slug}`)
+      const pin = getPin(slug)
+      socket.emit('pinData', { pin, value: gpio.read(pin) })
+    })
 
-      socket.on('pin:toggle', ({ slug, duration, date }) => {
-        log(`pinToggle: ${slug}, by: ${socket.decoded_token.name}`)
-        if (!checkTimeDiff(date)) {
-          return socket.emit('dateDiffError')
-        }
-        const pin = getPin(slug)
-        socket.emit('pinToggle', gpio.toggle(pin, duration))
+    socket.on('pin:write', ({ slug, value, date }) => {
+      log(`pinWrite: ${slug}`)
+      if (!checkTimeDiff(date)) {
+        return socket.emit('dateDiffError')
+      }
+      const pin = getPin(slug)
+      socket.emit('pinData', {
+        pin,
+        value: value === 0 ? gpio.off(pin) : gpio.on(pin)
       })
     })
+
+    socket.on('pin:toggle', ({ slug, duration, date }) => {
+      log(`pinToggle: ${slug}`)
+      if (!checkTimeDiff(date)) {
+        return socket.emit('dateDiffError')
+      }
+      const pin = getPin(slug)
+      socket.emit('pinToggle', gpio.toggle(pin, duration))
+    })
+  })
 
   gpio.emitter.on('change', data => {
     log('emit', data)

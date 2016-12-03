@@ -1,6 +1,8 @@
-// Check user type middleware
-export const checkAdmin = (req, res, next) => {
-  if (req.user.name !== 'Admin') {
+export const isAdmin = (db) => (req, res, next) => {
+  console.log('key', req.query.key)
+  const { name } = db.apiKeys.get(req.query.key)
+
+  if (name !== 'Admin') {
     return res
       .status(401)
       .json({ error: 'Not allowed' })

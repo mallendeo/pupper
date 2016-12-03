@@ -4,7 +4,6 @@ import cors from 'cors'
 import debug from 'debug'
 import express from 'express'
 import http from 'http'
-import jwt from 'express-jwt'
 import socketio from 'socket.io'
 
 import initDb from './lib/database'
@@ -17,7 +16,7 @@ const log = debug('pupper:app')
 const db = initDb('db.json')
 const pinsConfig = db.pins.all()
 
-const { NODE_ENV, PORT, JWT_SECRET } = process.env
+const { NODE_ENV, PORT } = process.env
 
 // GPIO lib
 // Must use CommonJS for conditional require
@@ -34,28 +33,25 @@ if (NODE_ENV === 'development') {
   log(chalk.bold.yellow('env: development'))
 }
 
-// Protect all API routes but the token renew ones
-app.use(jwt({ secret: JWT_SECRET }).unless({
-  path: [
-    '/api/token/renew',
-    '/api/token/verify',
-    '/api/apiKey/init',
-    '/api/apiKey/claim'
-  ]
-}))
-
-app.use((err, req, res, next) => {
-  if (err.name === 'UnauthorizedError') {
-    res.status(401).json({ error: 'Invalid token' })
-  }
-})
-
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(cors())
 
-websocket(io, gpio)
+// Protect all API routes but the key ones
+app.use((req, res, next) => {
+  const allowedRoutes = [
+    '/api/apiKey/init',
+    '/api/apiKey/claim'
+  ]
 
+  if (allowedRoutes.indexOf(req.path) === -1) {
+    return res.status(401).json({ error: 'Invalid key' })
+  }
+
+  next()
+})
+
+websocket(io, gpio, db)
 pinsRouter(router, gpio, db)
 authRouter(router, db)
 app.use('/api', router)

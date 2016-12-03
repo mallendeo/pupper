@@ -1,30 +1,15 @@
-import { checkAdmin } from './middleware/admin'
-
-const jwt = require('jsonwebtoken')
-
-const generateToken = (name, expire = 600) =>
-  jwt.sign({ name }, process.env.JWT_SECRET, {
-    issuer: 'pupper',
-    expiresIn: expire
-  })
+import { isAdmin } from './middleware/admin'
 
 export default (router, db) => {
-  router.post('/token/renew', (req, res) => {
-    const key = db.apiKeys.get(req.body.key)
-    if (key) return res.json({ token: generateToken(key.name) })
-
-    res.status(401).json({ error: 'Invalid key' })
-  })
-
-  router.post('/token/verify', (req, res) => {
-    const token = req.headers.authorization.replace('Bearer ', '')
-    try {
-      const verifiedToken = jwt.verify(token, process.env.JWT_SECRET)
-      res.json({ valid: true, token: verifiedToken })
-    } catch (e) {
-      res.json({ valid: false, error: e.message })
+  const checkAdmin = (req, res, next) => {
+    if (!isAdmin(req.query.key, db)) {
+      return res
+        .status(401)
+        .json({ error: 'Not allowed' })
     }
-  })
+
+    next()
+  }
 
   // Generate key for admin after install
   router.get('/apiKey/init', (req, res) => {
